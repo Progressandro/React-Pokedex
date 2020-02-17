@@ -1,9 +1,15 @@
 import React from 'react';
 import './App.css';
+import { Container } from '@material-ui/core';
+import NavBar from './components/NavBar';
+import SearchBox from './components/SearchBox';
 
 function App() {
   return (
-    <div className="App">Hello</div>
+    <Container disableGutters maxWidth={false}>
+      <NavBar />
+      <SearchBox />
+    </Container>
   );
 }
 
