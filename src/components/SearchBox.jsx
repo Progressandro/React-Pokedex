@@ -1,21 +1,43 @@
-import React, { useState } from 'react';
-import { TextField, Typography, Grid, Paper, Button } from '@material-ui/core';
-import JSONRequest from '../utils/requests';
+import React, { useState, useEffect } from 'react';
+import { Typography, Grid, Paper, Button } from '@material-ui/core';
+import LiveSearch from 'react-live-search';
 import styles from './styles/SearchBox';
 
-function SearchBox() {
-  const [searchTerm, setSearchTerm] = useState('');
+const Pokeapi = require('pokeapi-js-wrapper');
+const P = new Pokeapi.Pokedex();
 
-  const handleChange = (event) => {
-    setSearchTerm(event.target.value);
+function SearchBox() {
+  const [searchData, setSearchData] = useState({
+    term: '',
+    pokemonNames: [{ label: '', value: '' }],
+  });
+
+  useEffect(() => {
+    async function fetchNames() {
+      try {
+        let list = (await P.getPokemonsList()).results;
+        list = list
+          .filter((pokemon) => !pokemon.name.includes('-'))
+          .map((pokemon, idx) => ({
+            label: pokemon.name,
+            value: idx,
+          }));
+        setSearchData((prev) => ({ ...prev, pokemonNames: list }));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchNames();
+  }, []);
+
+  const handleChange = (value) => {
+    setSearchData({ ...searchData, term: value });
   };
 
   const searchByName = async () => {
     try {
-      const data = await JSONRequest(
-        `https://pokeapi.co/api/v2/pokemon/${searchTerm}/`,
-      );
-      console.log(data);
+      const pokemon = await P.getPokemonByName(searchData.term);
+      console.log(pokemon);
     } catch (error) {
       console.error('Error while searching by name: ', error);
     }
@@ -38,15 +60,22 @@ function SearchBox() {
                 Let&apos;s Check
               </Typography>
             </Grid>
-            <Grid container justify="center" item xs={4} spacing={2}>
+            <Grid
+              container
+              justify="center"
+              alignItems="center"
+              item
+              xs={8}
+              spacing={2}
+            >
               <Grid item xs={8}>
-                <TextField
+                <LiveSearch
                   onChange={handleChange}
                   size="small"
                   id="search-field"
                   style={styles.searchField}
-                  variant="standard"
-                  helperText="Ex: Gyarados"
+                  value={searchData.term}
+                  data={searchData.pokemonNames}
                 />
               </Grid>
               <Grid item xs={4}>

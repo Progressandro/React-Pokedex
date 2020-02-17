@@ -10,7 +10,7 @@ function App() {
     <Container disableGutters maxWidth={false}>
       <NavBar />
       <SearchBox />
-      <Pokemon />
+      {/* <Pokemon /> */}
     </Container>
   );
 }
