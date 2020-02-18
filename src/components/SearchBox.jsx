@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Typography, Grid, Paper, Button } from '@material-ui/core';
+import { useSelector, useDispatch } from 'react-redux';
 import LiveSearch from 'react-live-search';
 import styles from './styles/SearchBox';
+import updateSearch from '../actions/updateSearch';
+import updateList from '../actions/updateList';
 
 const Pokeapi = require('pokeapi-js-wrapper');
+
 const P = new Pokeapi.Pokedex();
 
 function SearchBox() {
-  const [searchData, setSearchData] = useState({
-    term: '',
-    pokemonNames: [{ label: '', value: '' }],
-  });
-
+  const searchTerm = useSelector((state) => state.searchTerm);
+  const pokemonList = useSelector((state) => state.pokemonList);
+  const dispatchList = useDispatch();
+  const dispatchTerm = useDispatch();
   useEffect(() => {
     async function fetchNames() {
       try {
@@ -22,23 +25,25 @@ function SearchBox() {
             label: pokemon.name,
             value: idx,
           }));
-        setSearchData((prev) => ({ ...prev, pokemonNames: list }));
+        dispatchList(updateList(list));
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(error);
       }
     }
     fetchNames();
-  }, []);
+  }, [dispatchList]);
 
   const handleChange = (value) => {
-    setSearchData({ ...searchData, term: value });
+    dispatchTerm(updateSearch(value));
   };
 
   const searchByName = async () => {
     try {
-      const pokemon = await P.getPokemonByName(searchData.term);
+      const pokemon = await P.getPokemonByName(searchTerm);
       console.log(pokemon);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error while searching by name: ', error);
     }
   };
@@ -74,8 +79,8 @@ function SearchBox() {
                   size="small"
                   id="search-field"
                   style={styles.searchField}
-                  value={searchData.term}
-                  data={searchData.pokemonNames}
+                  value={searchTerm}
+                  data={pokemonList}
                 />
               </Grid>
               <Grid item xs={4}>

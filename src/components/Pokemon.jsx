@@ -14,7 +14,7 @@ import styles from './styles/Pokemon';
 function Pokemon() {
   return (
     <Grid container justify="center">
-      <Grid item xs={6}>
+      <Grid item xs={8}>
         <Card>
           <CardActionArea>
             <CardMedia
