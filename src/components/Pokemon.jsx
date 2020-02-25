@@ -14,27 +14,23 @@ import styles from './styles/Pokemon';
 function Pokemon() {
   return (
     <Grid container justify="center">
-      <Grid item xs={8}>
+      <Grid item xs={2  }>
         <Card>
           <CardActionArea>
             <CardMedia
-              image="https://material-ui.com/static/images/cards/contemplative-reptile.jpg"
-              title="Contemplative Reptile"
+              image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
+              title="Bulbasaur"
               style={styles.media}
             />
             <CardContent>
-              <Typography gutterBottom variant="h5" component="h2">
-                Lizard
-              </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
-                Lizards are a widespread group of squamate reptiles, with over 6,000 species,
-                ranging across all continents except Antarctica
+              <Typography gutterBottom variant="h5" component="h2" align="center">
+                Bulbasaur
               </Typography>
             </CardContent>
           </CardActionArea>
           <CardActions>
             <Button size="small" color="primary">
-              Share
+              Under construction
             </Button>
           </CardActions>
         </Card>

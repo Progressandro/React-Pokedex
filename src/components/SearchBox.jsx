@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
-import { Typography, Grid, Paper, Button } from '@material-ui/core';
 import { useSelector, useDispatch } from 'react-redux';
-import LiveSearch from 'react-live-search';
-import styles from './styles/SearchBox';
+import { Grid, Typography } from '@material-ui/core';
+import Autocomplete from 'react-autocomplete';
 import updateSearch from '../actions/updateSearch';
 import updateList from '../actions/updateList';
 
@@ -10,11 +9,12 @@ const Pokeapi = require('pokeapi-js-wrapper');
 
 const P = new Pokeapi.Pokedex();
 
-function SearchBox() {
+export default function SearchBox() {
   const searchTerm = useSelector((state) => state.searchTerm);
   const pokemonList = useSelector((state) => state.pokemonList);
   const dispatchList = useDispatch();
   const dispatchTerm = useDispatch();
+  // Initial request for pokemon
   useEffect(() => {
     async function fetchNames() {
       try {
@@ -34,71 +34,55 @@ function SearchBox() {
     fetchNames();
   }, [dispatchList]);
 
-  const handleChange = (value) => {
-    dispatchTerm(updateSearch(value));
+  // Update search term
+  const handleChange = (event) => {
+    dispatchTerm(updateSearch(event.target.value));
   };
 
-  const searchByName = async () => {
-    try {
-      const pokemon = await P.getPokemonByName(searchTerm);
-      console.log(pokemon);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error while searching by name: ', error);
-    }
-  };
+  const renderResult = (item, highlighter) => (
+    <div
+      key={item.id}
+      style={{
+        backgroundColor: highlighter ? '#eee' : 'white',
+        cursor: 'pointer',
+      }}
+    >
+      {item.label}
+    </div>
+  );
 
   return (
-    <Grid container justify="center">
-      <Grid justify="center" alignItems="center" container item xs={8}>
-        <Paper style={styles.paper}>
-          <Grid
-            container
-            direction="column"
-            item
-            justify="center"
-            alignItems="center"
-            xs={12}
-          >
-            <Grid item xs={4}>
-              <Typography variant="h6" align="right">
-                Let&apos;s Check
-              </Typography>
-            </Grid>
-            <Grid
-              container
-              justify="center"
-              alignItems="center"
-              item
-              xs={8}
-              spacing={2}
-            >
-              <Grid item xs={8}>
-                <LiveSearch
-                  onChange={handleChange}
-                  size="small"
-                  id="search-field"
-                  style={styles.searchField}
-                  value={searchTerm}
-                  data={pokemonList}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <Button
-                  onClick={searchByName}
-                  style={styles.searchButton}
-                  variant="contained"
-                  color="primary"
-                >
-                  Search
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Paper>
+    <Grid container alignItems="center" direction="column">
+      <Grid item container xs={4} justify="center">
+        <Typography variant="h4" align="center">
+          Let&apos;s check!
+        </Typography>
+      </Grid>
+      <Grid item container xs={4} justify="center">
+        <Autocomplete
+          inputProps={{
+            style: {
+              height: 20,
+              padding: 10,
+              borderColor: 'lightgray',
+              '&hover': {
+                borderColor: 'transparent',
+              },
+            },
+            placeholder: 'Ex: Gyarados',
+          }}
+          wrapperStyle={{zIndex: 2}}
+          getItemValue={(item) => item.label}
+          items={pokemonList}
+          shouldItemRender={(item, value) => {
+            return value && item.label.toLowerCase().includes(value.toLowerCase());
+          }}
+          renderItem={renderResult}
+          value={searchTerm}
+          onChange={handleChange}
+          onSelect={(value) => dispatchTerm(updateSearch(value))}
+        />
       </Grid>
     </Grid>
   );
 }
-
-export default SearchBox;
