@@ -1,10 +1,8 @@
-const selectedPokemon = (state = [{ title: '', image: '' }], action) => {
+export default (state = { name: '', data: {} }, action) => {
   switch (action.type) {
-    case 'UPDATE_POKEMON':
+    case 'UPDATE_SELECTED':
       return action.payload;
     default:
       return state;
   }
 };
-
-export default selectedPokemon;

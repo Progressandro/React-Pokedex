@@ -1,5 +1,5 @@
 export default {
   media: {
-    height: 200,
+    height: 300,
   },
 };

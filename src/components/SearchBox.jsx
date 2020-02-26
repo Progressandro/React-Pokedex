@@ -4,6 +4,7 @@ import { Grid, Typography } from '@material-ui/core';
 import Autocomplete from 'react-autocomplete';
 import updateSearch from '../actions/updateSearch';
 import updateList from '../actions/updateList';
+import updateSelected from '../actions/updateSelected';
 
 const Pokeapi = require('pokeapi-js-wrapper');
 
@@ -12,8 +13,10 @@ const P = new Pokeapi.Pokedex();
 export default function SearchBox() {
   const searchTerm = useSelector((state) => state.searchTerm);
   const pokemonList = useSelector((state) => state.pokemonList);
+  // const selectedPokemon = useSelector((state) => state.selectedPokemon);
   const dispatchList = useDispatch();
   const dispatchTerm = useDispatch();
+  const dispatchSelected = useDispatch();
   // Initial request for pokemon
   useEffect(() => {
     async function fetchNames() {
@@ -21,9 +24,9 @@ export default function SearchBox() {
         let list = (await P.getPokemonsList()).results;
         list = list
           .filter((pokemon) => !pokemon.name.includes('-'))
-          .map((pokemon, idx) => ({
+          .map((pokemon) => ({
             label: pokemon.name,
-            value: idx,
+            value: pokemon.name,
           }));
         dispatchList(updateList(list));
       } catch (error) {
@@ -39,9 +42,26 @@ export default function SearchBox() {
     dispatchTerm(updateSearch(event.target.value));
   };
 
+  const fetchPokemon = async (value) => {
+    try {
+      dispatchTerm(updateSearch(value));
+      const result = await P.getPokemonByName(value);
+      if (result) {
+        const pokemon = {
+          name: result.name,
+          image: result.sprites.front_default,
+          id: result.id,
+        };
+        dispatchSelected(updateSelected({ name: value, data: pokemon }));
+      }
+    } catch (error) {
+      console.error('API call error:', error);
+    }
+  }
+
   const renderResult = (item, highlighter) => (
     <div
-      key={item.id}
+      key={item.value}
       style={{
         backgroundColor: highlighter ? '#eee' : 'white',
         cursor: 'pointer',
@@ -71,16 +91,18 @@ export default function SearchBox() {
             },
             placeholder: 'Ex: Gyarados',
           }}
-          wrapperStyle={{zIndex: 2}}
+          wrapperStyle={{ zIndex: 2 }}
           getItemValue={(item) => item.label}
           items={pokemonList}
           shouldItemRender={(item, value) => {
-            return value && item.label.toLowerCase().includes(value.toLowerCase());
+            return (
+              value && item.label.toLowerCase().includes(value.toLowerCase())
+            );
           }}
           renderItem={renderResult}
           value={searchTerm}
           onChange={handleChange}
-          onSelect={(value) => dispatchTerm(updateSearch(value))}
+          onSelect={fetchPokemon}
         />
       </Grid>
     </Grid>
