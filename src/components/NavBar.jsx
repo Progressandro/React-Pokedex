@@ -6,8 +6,8 @@ import styles from './styles/NavBar';
 
 function NavBar() {
   return (
-    <AppBar position="static">
-      <Toolbar>
+    <AppBar position="static" style={styles.container}>
+      <Toolbar style={styles.navigationBar}>
         <Typography variant="h6" style={styles.title}>
           Pokédex
         </Typography>

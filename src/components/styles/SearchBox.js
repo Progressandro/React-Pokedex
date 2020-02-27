@@ -7,10 +7,18 @@ export default {
     zIndex: 1,
   },
   searchField: {
-    paddingLeft: 10,
+    height: 20,
+    padding: 10,
+    borderColor: 'lightgray',
+  },
+  searchFieldWrapper: {
     zIndex: 2,
   },
   searchButton: {
     zIndex: 0,
+  },
+  result: {
+    backgroundColor: 'white',
+    cursor: 'pointer',
   },
 };

@@ -5,6 +5,7 @@ import Autocomplete from 'react-autocomplete';
 import updateSearch from '../actions/updateSearch';
 import updateList from '../actions/updateList';
 import updateSelected from '../actions/updateSelected';
+import styles from './styles/SearchBox';
 
 const Pokeapi = require('pokeapi-js-wrapper');
 
@@ -13,7 +14,6 @@ const P = new Pokeapi.Pokedex();
 export default function SearchBox() {
   const searchTerm = useSelector((state) => state.searchTerm);
   const pokemonList = useSelector((state) => state.pokemonList);
-  // const selectedPokemon = useSelector((state) => state.selectedPokemon);
   const dispatchList = useDispatch();
   const dispatchTerm = useDispatch();
   const dispatchSelected = useDispatch();
@@ -30,8 +30,7 @@ export default function SearchBox() {
           }));
         dispatchList(updateList(list));
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(error);
+        throw new Error(error);
       }
     }
     fetchNames();
@@ -55,16 +54,16 @@ export default function SearchBox() {
         dispatchSelected(updateSelected({ name: value, data: pokemon }));
       }
     } catch (error) {
-      console.error('API call error:', error);
+      throw new Error(error);
     }
-  }
+  };
 
-  const renderResult = (item, highlighter) => (
+  const renderResult = (item, highlighted) => (
     <div
       key={item.value}
       style={{
-        backgroundColor: highlighter ? '#eee' : 'white',
-        cursor: 'pointer',
+        ...styles.result,
+        backgroundColor: highlighted ? '#eee' : 'white',
       }}
     >
       {item.label}
@@ -81,17 +80,10 @@ export default function SearchBox() {
       <Grid item container xs={4} justify="center">
         <Autocomplete
           inputProps={{
-            style: {
-              height: 20,
-              padding: 10,
-              borderColor: 'lightgray',
-              '&hover': {
-                borderColor: 'transparent',
-              },
-            },
+            style: styles.searchField,
             placeholder: 'Ex: Gyarados',
           }}
-          wrapperStyle={{ zIndex: 2 }}
+          wrapperStyle={styles.searchFieldWrapper}
           getItemValue={(item) => item.label}
           items={pokemonList}
           shouldItemRender={(item, value) => {
